@@ -8,7 +8,7 @@ mkdir -p $CERTS_DIR
 if [ ! -f $CERTS_DIR/ca.crt ]; then
   openssl genrsa -out $CERTS_DIR/ca.key 4096
   openssl req -x509 -new -nodes -key $CERTS_DIR/ca.key -sha256 -days 3650 \
-    -out $CERTS_DIR/ca.crt -subj "/C=RU/ST=Moscow/L=Moscow/O=SOA Lab/OU=Development/CN=LocalRootCA" \
+    -out $CERTS_DIR/ca.crt -subj "CN=LocalRootCA" \
     -extensions v3_ca -config $SAN_CONFIG
 fi
 

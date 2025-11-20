@@ -51,7 +51,7 @@ services:
       - soa-net
     volumes:
       - nginx-certs:/certs:ro
-      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx/frontend:/usr/share/nginx/html:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
   certs-gen:
