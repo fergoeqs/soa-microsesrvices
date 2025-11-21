@@ -1,7 +1,6 @@
 package org.fergoeqs.dtos;
 
-import jakarta.validation.constraints.Min;
-
+import javax.validation.constraints.Min;
 import java.util.List;
 
 public record FilterRequestDTO(

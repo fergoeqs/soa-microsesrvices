@@ -1,10 +1,10 @@
 package org.fergoeqs.controllers;
 
 import lombok.RequiredArgsConstructor;
-
 import org.fergoeqs.dtos.FilterConditionDTO;
 import org.fergoeqs.dtos.FilterRequestDTO;
 import org.fergoeqs.dtos.SortOptionDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,9 +21,11 @@ public class OrgDirectoryController {
 
     private final WebClient webClient;
 
+    @Value("${first-service.base-url}")
+    private String firstServiceBaseUrl;
+
     @PostMapping("/filter/turnover")
     public Mono<ResponseEntity<Object>> filterByTurnover(@RequestBody Map<String, Object> body) {
-
         Integer min = (Integer) body.get("minAnnualTurnover");
         Integer max = (Integer) body.get("maxAnnualTurnover");
         if (min == null || max == null || min > max) {
@@ -45,35 +47,34 @@ public class OrgDirectoryController {
         filters.add(new FilterConditionDTO("annualTurnover", "between", List.of(min, max)));
 
         List<SortOptionDTO> sort = (List<SortOptionDTO>) body.getOrDefault("sort", List.of());
-
         Integer page = (Integer) body.getOrDefault("page", 0);
         Integer size = (Integer) body.getOrDefault("size", 20);
 
         FilterRequestDTO requestDTO = new FilterRequestDTO(filters, sort, page, size);
 
         return webClient.post()
-                .uri("/search")
+                .uri(firstServiceBaseUrl + "/search")
                 .bodyValue(requestDTO)
                 .retrieve()
                 .bodyToMono(Object.class)
                 .map(ResponseEntity::ok)
-                .onErrorResume(e ->
-                        Mono.just(ResponseEntity.status(500).body("Error calling organization service: " + e.getMessage()))
-                );
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(500)
+                        .body("Error calling organization service: " + e.getMessage())));
     }
 
-
     @PostMapping("/order")
-    public Mono<ResponseEntity<?>> orderOrganizations(@RequestBody Map<String, Object> body) {
+    public Mono<ResponseEntity<Object>> orderOrganizations(@RequestBody Map<String, Object> body) {
         if (!body.containsKey("sort")) {
             return Mono.just(ResponseEntity.badRequest().body("Missing sort criteria"));
         }
 
         return webClient.post()
-                .uri("/search")
+                .uri(firstServiceBaseUrl + "/search")
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Object.class)
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(500)
+                        .body("Error calling organization service: " + e.getMessage())));
     }
 }

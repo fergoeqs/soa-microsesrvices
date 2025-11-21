@@ -1,82 +1,60 @@
 services:
-#  wildfly:
-#    build:
-#      context: ./first-service
-#      dockerfile: Dockerfile-wildfly
-#    container_name: organization-service-wildfly
-#    ports:
-##      - "8080:8080"
-#      - "9990:9990"
-#    depends_on:
-#      - dev-pg12
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=production
-#    networks:
-#      - soa-net
-#    restart: unless-stopped
-#    volumes:
-#      - nginx-certs:/certs:ro
+  config-service:
+    build: ./config-service
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - soa-net
+    restart: unless-stopped
+
+  eureka-service:
+    build: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - soa-net
+    restart: unless-stopped
+    depends_on:
+      - config-service
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    networks:
+      - soa-net
+    restart: unless-stopped
+    depends_on:
+      - eureka-service
+      - config-service
+
+  orgdirectory-service:
+    build: ./second-service
+    container_name: orgdirectory-service
+    ports:
+      - "8081:8081"
+    networks:
+      - soa-net
+    restart: unless-stopped
+    depends_on:
+      - eureka-service
+      - config-service
+      - wildfly
+
   wildfly:
     build:
       context: ./first-module
       dockerfile: Dockerfile-wildfly
     container_name: organization-service-wildfly
     ports:
-      - "8080:8080"
+      - "8082:8080"
       - "9990:9990"
-    depends_on:
-      dev-pg12:
-        condition: service_healthy
     networks:
       - soa-net
     restart: unless-stopped
-
-#  payara:
-#    build:
-#      context: ./second-service
-#      dockerfile: Dockerfile-payara
-#    container_name: orgdirectory-service-payara
-#    ports:
-##      - "8181:8080"
-#      - "8444:8443"
-#    depends_on:
-#      - wildfly
-#    networks:
-#      - soa-net
-#    volumes:
-#      - nginx-certs:/certs:ro
-
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile-nginx
-#    container_name: nginx
-#    ports:
-#      - "443:443"
-##      - "81:80"
-##    volumes:
-##      - nginx-certs:/certs:ro
-##      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#    depends_on:
-#      - wildfly
-#      - payara
-#      - certs-gen
-#    networks:
-#      - soa-net
-#    volumes:
-#      - nginx-certs:/certs:ro
-#      - ./nginx/frontend:/usr/share/nginx/html:ro
-#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#
-#  certs-gen:
-#    image: openjdk:17-slim
-#    container_name: certs-gen
-#    volumes:
-#      - ./nginx/certs-scripts:/certs-scripts:ro
-#      - nginx-certs:/certs
-#    working_dir: /certs
-#    entrypoint: [ "sh", "/certs-scripts/generate-certs.sh" ]
-
 
   dev-pg12:
     container_name: soa-db
@@ -89,31 +67,12 @@ services:
       - dev-db-volume:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U soa -d soa"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
     networks:
       - soa-net
 
-#  swagger-ui:
-#    image: swaggerapi/swagger-ui
-#    container_name: organization-api-docs
-#    ports:
-#      - "8080:8080"
-#    volumes:
-#      - ./:/usr/share/nginx/html/specs
-#    environment:
-#      SWAGGER_JSON: /usr/share/nginx/html/specs/ipsreleasenofun.yml
-##      API_URL: http://localhost:8080/organization-service/v3/api-docs
-#    restart: unless-stopped
-#    networks:
-#      - soa-net
-
 volumes:
   dev-db-volume: {}
-  nginx-certs: {}
 
 networks:
   soa-net:
+    driver: bridge

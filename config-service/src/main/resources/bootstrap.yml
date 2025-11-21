@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: orgdirectory-service
+  cloud:
+    config:
+      uri: http://config-service:8888
+      username: configuser
+      password: configpass
+      fail-fast: true
