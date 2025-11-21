@@ -1,7 +1,6 @@
 package org.fergoeqs.dtos;
 
-
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 public record FilterConditionDTO(
         @NotNull String field,

@@ -1,34 +1,37 @@
-#server:
-#  port: 8080
-#  servlet:
-#    context-path: /orgdirectory
-#  ssl:
-#    enabled: true
-#    key-store: classpath:payara.jks
-#    key-store-password: fergoeqskey
-#
-##first-service:
-##  base-url: https://wildfly:8443/organizations
-##  trust-store: classpath:truststore.jks
-##  trust-store-password: fergoeqskey
-#
-#first-service:
-#  base-url: https://nginx/organization-service
-#  trust-store: classpath:truststore.jks
-#  trust-store-password: fergoeqskey
 server:
-  port: 8080
-  servlet:
-    context-path: /orgdirectory-service
-  ssl:
-    enabled: true
-    key-store: /certs/server.p12
-    key-store-password: fergoeqskey
-    key-store-type: PKCS12
+  port: 8081
+
+spring:
+  application:
+    name: orgdirectory-service
+  cloud:
+    config:
+      uri: http://config-service:8888
+      username: configuser
+      password: configpass
+      fail-fast: true
+    loadbalancer:
+      enabled: true
 
 first-service:
-#  base-url: https://nginx/first-service
-#  base-url: http://organization-service-wildfly:8080/first-service
-  base-url:  http://organization-service-wildfly:8080/first-service/organizations
-  trust-store: /certs/truststore.jks
-  trust-store-password: fergoeqskey
+  base-url: http://organization-service-wildfly:8080/first-service/organizations
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.loadbalancer: DEBUG

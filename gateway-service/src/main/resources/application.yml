@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: orgdirectory-service
+          uri: lb://orgdirectory-service
+          predicates:
+            - Path=/orgdirectory/**
+          filters:
+            - StripPrefix=1
+        - id: organization-service
+          uri: lb://organization-service-wildfly
+          predicates:
+            - Path=/organizations/**
+          filters:
+            - StripPrefix=1
+    loadbalancer:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+ribbon:
+  eureka:
+    enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG

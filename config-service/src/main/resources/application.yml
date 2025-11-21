@@ -1,0 +1,26 @@
+server:
+  port: 8888
+
+spring:
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo
+  profiles:
+    active: native
+  security:
+    user:
+      name: configuser
+      password: configpass
+
+spring.cloud.config.server.git.enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    org.springframework.cloud.config: INFO
+    org.springframework.boot: INFO
