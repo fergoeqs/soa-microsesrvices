@@ -29,6 +29,12 @@ public class OrganizationResource {
         return "JAX-RS IS WORKING! OrganizationService: " + (organizationService != null ? "INJECTED" : "NULL");
     }
 
+    @GET
+    @Path("/health")
+    public Response health() {
+        return Response.ok(Map.of("status", "UP")).build();
+    }
+
     @POST
     @Path("/search")
     public Response searchOrganizations(@Valid FilterRequestDTO filterRequest) {

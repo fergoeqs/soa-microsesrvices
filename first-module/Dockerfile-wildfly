@@ -7,6 +7,8 @@ COPY web-module/build/libs/web-module.war /opt/jboss/wildfly/standalone/deployme
 
 COPY wildfly-config/configure-datasource.cli /opt/jboss/wildfly/
 
+COPY web-module/register-consul.sh /opt/jboss/wildfly/bin/register-consul.sh
+
 EXPOSE 8080 9990
 
-CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+ENTRYPOINT ["/bin/sh", "-c", "/opt/jboss/wildfly/bin/register-consul.sh & exec /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0"]
