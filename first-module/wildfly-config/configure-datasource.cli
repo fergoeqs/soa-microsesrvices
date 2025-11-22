@@ -1,19 +1,14 @@
-# Ждем запуска WildFly
 echo "Waiting for WildFly to start..."
 
-# Скачиваем драйвер PostgreSQL внутри контейнера
 curl -o /tmp/postgresql.jar https://jdbc.postgresql.org/download/postgresql-42.7.4.jar
 
-# Добавляем модуль PostgreSQL
 module add --name=org.postgresql --resources=/tmp/postgresql.jar --dependencies=javax.api,javax.transaction.api
 
-# Регистрируем JDBC драйвер
 /subsystem=datasources/jdbc-driver=postgresql:add(\
     driver-name="postgresql",\
     driver-module-name="org.postgresql",\
     driver-class-name=org.postgresql.Driver)
 
-# Создаем datasource
 /subsystem=datasources/data-source=OrganizationDS:add(\
     jndi-name=java:jboss/datasources/OrganizationDS,\
     driver-name=postgresql,\
@@ -29,8 +24,5 @@ module add --name=org.postgresql --resources=/tmp/postgresql.jar --dependencies=
     background-validation=true,\
     background-validation-millis=60000)
 
-# Проверяем что datasource создан
 /subsystem=datasources/data-source=OrganizationDS:test-connection-in-pool
 
-# Выводим сообщение об успехе
-echo "PostgreSQL datasource configured successfully!"

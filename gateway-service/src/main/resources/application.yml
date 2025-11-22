@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: gateway-service
+  autoconfigure:
+    exclude:
+      - org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration
   cloud:
     gateway:
       discovery:
@@ -15,16 +18,22 @@ spring:
           uri: lb://orgdirectory-service
           predicates:
             - Path=/orgdirectory/**
-          filters:
-            - StripPrefix=1
         - id: organization-service
-          uri: lb://organization-service-wildfly
+          uri: lb://organization-service
           predicates:
             - Path=/organizations/**
           filters:
-            - StripPrefix=1
+            - RewritePath=/organizations(?<segment>/?.*), /web-module/api/organizations${segment}
     loadbalancer:
       enabled: true
+
+    consul:
+      host: consul
+      port: 8500
+      discovery:
+        enabled: true
+        register: false
+        register-health-check: false
 
 eureka:
   client:
