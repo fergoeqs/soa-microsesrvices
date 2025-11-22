@@ -4,7 +4,7 @@ CONSUL_URL="http://consul:8500"
 SERVICE_NAME="organization-service"
 SERVICE_ID="organization-service-1"
 SERVICE_ADDRESS="wildfly"
-SERVICE_PORT=8080
+SERVICE_PORT=8082
 
 while ! curl -s $CONSUL_URL/v1/status/leader >/dev/null; do
     echo "Waiting for Consul..."

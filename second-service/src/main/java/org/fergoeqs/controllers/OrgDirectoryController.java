@@ -26,6 +26,8 @@ public class OrgDirectoryController {
 
     @PostMapping("/filter/turnover")
     public Mono<ResponseEntity<Object>> filterByTurnover(@RequestBody Map<String, Object> body) {
+        System.out.println(">>> firstServiceBaseUrl = " + firstServiceBaseUrl);
+
         Integer min = (Integer) body.get("minAnnualTurnover");
         Integer max = (Integer) body.get("maxAnnualTurnover");
         if (min == null || max == null || min > max) {
@@ -51,7 +53,6 @@ public class OrgDirectoryController {
         Integer size = (Integer) body.getOrDefault("size", 20);
 
         FilterRequestDTO requestDTO = new FilterRequestDTO(filters, sort, page, size);
-
         return webClient.post()
                 .uri(firstServiceBaseUrl + "/search")
                 .bodyValue(requestDTO)

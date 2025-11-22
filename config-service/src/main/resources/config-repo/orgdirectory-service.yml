@@ -2,7 +2,8 @@ server:
   port: 8081
 
 first-service:
-  base-url: http://organization-service-wildfly:8080/first-service/organizations
+  base-url: http://gateway-service/organizations
+#  http://organization-service-wildfly:8080/first-service/organizations
 
 eureka:
   client:
