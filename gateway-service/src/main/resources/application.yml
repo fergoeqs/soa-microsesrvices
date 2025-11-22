@@ -14,24 +14,16 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: frontend
-          uri: lb://frontend
-          predicates:
-            - Path=/**
-          filters:
-            - StripPrefix=0
         - id: orgdirectory-service
-          uri: lb://ORGDIRECTORY-SERVICE
+          uri: lb://orgdirectory-service
           predicates:
             - Path=/orgdirectory/**
-          filters:
-            - StripPrefix=1
         - id: organization-service
           uri: lb://organization-service
           predicates:
             - Path=/organizations/**
           filters:
-            - RewritePath=/organizations(?<segment>/?.*), /web-module/api/organizations$\{segment}
+            - RewritePath=/organizations(?<segment>/?.*), /web-module/api/organizations${segment}
     loadbalancer:
       enabled: true
 
