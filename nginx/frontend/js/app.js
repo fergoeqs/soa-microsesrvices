@@ -838,7 +838,7 @@ async function performSearch() {
             size: 50
         };
 
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/search`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/search`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

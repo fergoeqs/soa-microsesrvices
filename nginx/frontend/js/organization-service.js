@@ -26,7 +26,7 @@ async function createOrganization() {
             throw new Error(validationError);
         }
 
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ async function createOrganization() {
 }
 async function editOrganization(id) {
     try {
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/${id}`);
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/${id}`);
         if (!response.ok) {
             throw new Error('Failed to fetch organization');
         }
@@ -104,7 +104,7 @@ async function updateOrganization() {
             throw new Error(validationError);
         }
 
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/${currentEditingId}`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/${currentEditingId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ async function deleteOrganization(id) {
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/${id}`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/${id}`, {
             method: 'DELETE'
         });
 
@@ -249,7 +249,7 @@ function validateOrganizationData(data) {
 
 async function groupByFullName() {
     try {
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/group-by-fullname`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/group-by-fullname`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ async function countByAddress() {
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/count-by-address`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/count-by-address`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -395,7 +395,7 @@ async function deleteByAddress() {
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/organizations/by-address`, {
+        const response = await fetch(`${API_CONFIG.ORGANIZATION_SERVICE}/by-address`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

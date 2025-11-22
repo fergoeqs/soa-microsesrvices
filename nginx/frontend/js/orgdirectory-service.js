@@ -46,7 +46,7 @@ async function filterByTurnover() {
             size: 50
         };
 
-        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/orgdirectory/filter/turnover`, {
+        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/filter/turnover`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ async function groupByFullNameDirectory() {
     try {
         showLoading('orgdirectoryResults');
 
-        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/orgdirectory/group/fullname`, {
+        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/group/fullname`, {
             method: 'GET'
         });
 
@@ -172,7 +172,7 @@ async function countByAddressDirectory() {
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/orgdirectory/count/address?street=${encodeURIComponent(street)}`, {
+        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/count/address?street=${encodeURIComponent(street)}`, {
             method: 'GET'
         });
 
@@ -206,7 +206,7 @@ async function deleteByAddressDirectory() {
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/orgdirectory/delete/address`, {
+        const response = await fetch(`${API_CONFIG.ORGDIRECTORY_SERVICE}/delete/address`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
