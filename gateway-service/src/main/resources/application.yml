@@ -23,7 +23,7 @@ spring:
           predicates:
             - Path=/organizations/**
           filters:
-            - RewritePath=/organizations/(?<segment>.*), /organizations/api/\$\{segment}
+            - RewritePath=/organizations(?<segment>/?.*), /web-module/api/organizations${segment}
     loadbalancer:
       enabled: true
 

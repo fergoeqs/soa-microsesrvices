@@ -1,28 +1,31 @@
-echo "Waiting for WildFly to start..."
+embed-server --server-config=standalone.xml --std-out=echo
 
-curl -o /tmp/postgresql.jar https://jdbc.postgresql.org/download/postgresql-42.7.4.jar
+batch
+module add --name=org.postgresql \
+    --resources=/opt/jboss/wildfly/postgresql.jar \
+    --dependencies=javax.api,javax.transaction.api
 
-module add --name=org.postgresql --resources=/tmp/postgresql.jar --dependencies=javax.api,javax.transaction.api
+/subsystem=datasources/jdbc-driver=postgresql:add( \
+    driver-name="postgresql", \
+    driver-module-name="org.postgresql", \
+    driver-class-name="org.postgresql.Driver")
 
-/subsystem=datasources/jdbc-driver=postgresql:add(\
-    driver-name="postgresql",\
-    driver-module-name="org.postgresql",\
-    driver-class-name=org.postgresql.Driver)
-
-/subsystem=datasources/data-source=OrganizationDS:add(\
-    jndi-name=java:jboss/datasources/OrganizationDS,\
-    driver-name=postgresql,\
-    connection-url=jdbc:postgresql://dev-pg12:5432/soa,\
-    user-name=soa,\
-    password=soasoa,\
-    min-pool-size=5,\
-    max-pool-size=20,\
-    enabled=true,\
-    validate-on-match=true,\
-    valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker,\
-    exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter,\
-    background-validation=true,\
+/subsystem=datasources/data-source=OrganizationDS:add( \
+    jndi-name=java:jboss/datasources/OrganizationDS, \
+    driver-name=postgresql, \
+    connection-url=jdbc:postgresql://dev-pg12:5432/soa, \
+    user-name=soa, \
+    password=soasoa, \
+    min-pool-size=5, \
+    max-pool-size=20, \
+    enabled=true, \
+    validate-on-match=true, \
+    valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker, \
+    exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter, \
+    background-validation=true, \
     background-validation-millis=60000)
 
 /subsystem=datasources/data-source=OrganizationDS:test-connection-in-pool
+run-batch
 
+stop-embedded-server

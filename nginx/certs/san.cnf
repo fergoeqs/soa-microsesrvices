@@ -4,13 +4,29 @@ req_extensions = v3_req
 prompt = no
 
 [ req_distinguished_name ]
+C = RU
+ST = Moscow
+L = Moscow
+O = SOA Lab
+OU = Development
 CN = 138.124.89.175
 
 [ v3_req ]
 subjectAltName = @alt_names
-keyUsage = keyEncipherment, dataEncipherment
+keyUsage = digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
+basicConstraints = CA:FALSE
 
 [ alt_names ]
-DNS.1 = 138.124.89.175
+DNS.1 = myapp.local
+DNS.2 = localhost
+DNS.3 = *.myapp.local
 IP.1 = 127.0.0.1
+IP.2 = 138.124.89.175
+IP.3 = ::1
+
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:TRUE
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign

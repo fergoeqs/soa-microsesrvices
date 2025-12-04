@@ -25,7 +25,7 @@ public class OrganizationResource {
     @GET
     @Path("/test")
     public String test() {
-        return "JAX-RS IS WORKING! OrganizationService: " + (organizationService != null ? "INJECTED" : "NULL");
+        return "rabotaet tvar: " + (organizationService != null ? "INJECTED" : "NULL");
     }
 
     @GET
