@@ -43,10 +43,6 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
-#
-#ribbon:
-#  eureka:
-#    enabled: true
 
 logging:
   level:
