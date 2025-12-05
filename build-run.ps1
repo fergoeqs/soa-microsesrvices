@@ -1,7 +1,6 @@
 $ErrorActionPreference = "Stop"
 
 $projectDirs = @(
-    "config-service",
     "eureka-service",
     "first-module",
     "gateway-service",
@@ -44,4 +43,3 @@ try {
 }
 
 docker compose up -d
-

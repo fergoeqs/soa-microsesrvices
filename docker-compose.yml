@@ -1,6 +1,4 @@
 services:
-
-
   eureka-service:
     build: ./eureka-service
     container_name: eureka-service
@@ -28,6 +26,18 @@ services:
     container_name: orgdirectory-service
     ports:
       - "8081:8081"
+    networks:
+      - soa-net
+    restart: unless-stopped
+    depends_on:
+      - eureka-service
+      - wildfly
+
+  orgdirectory-service-2:
+    build: ./second-service
+    container_name: orgdirectory-service-2
+    ports:
+      - "8089:8081"
     networks:
       - soa-net
     restart: unless-stopped
@@ -111,65 +121,6 @@ services:
     networks:
       - soa-net
 
-#  consul-ui:
-#    image: jippi/hashi-ui:latest
-#    container_name: consul-ui
-#    ports:
-#      - "8081:80"
-#    environment:
-#      - HASHI_UI_API_ADDR=http://consul:8500
-#    depends_on:
-#      - consul
-#    networks:
-#      - soa-net
-
-#  payara:
-#    build:
-#      context: ./second-service
-#      dockerfile: Dockerfile-payara
-#    container_name: orgdirectory-service-payara
-#    ports:
-##      - "8181:8080"
-#      - "8444:8443"
-#    depends_on:
-#      - wildfly
-#    networks:
-#      - soa-net
-#    volumes:
-#      - nginx-certs:/certs:ro
-
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile-nginx
-#    container_name: nginx
-#    ports:
-#      - "443:443"
-##      - "81:80"
-##    volumes:
-##      - nginx-certs:/certs:ro
-##      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#    depends_on:
-#      - wildfly
-#      - payara
-#      - certs-gen
-#    networks:
-#      - soa-net
-#    volumes:
-#      - nginx-certs:/certs:ro
-#      - ./nginx/frontend:/usr/share/nginx/html:ro
-#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#
-#  certs-gen:
-#    image: openjdk:17-ea-17-slim
-#    container_name: certs-gen
-#    volumes:
-#      - ./nginx/certs-scripts:/certs-scripts:ro
-#      - nginx-certs:/certs
-#    working_dir: /certs
-#    entrypoint: [ "sh", "/certs-scripts/generate-certs.sh" ]
-
-
   dev-pg12:
     container_name: soa-db
     image: postgres:17
@@ -209,20 +160,6 @@ services:
 #    depends_on:
 #      - gateway-service
 
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile-nginx
-#    container_name: nginx
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    networks:
-#      - soa-net
-##    volumes:
-###      - nginx-certs:/certs:ro
-##      - ./frontend:/usr/share/nginx/html:ro
-##      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
   nginx:
     build:
       context: ./nginx
