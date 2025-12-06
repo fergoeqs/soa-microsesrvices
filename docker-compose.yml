@@ -1,4 +1,12 @@
 services:
+  config-service:
+    build: ./config-service
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - soa-net
+    restart: unless-stopped
 
 
   eureka-service:
@@ -9,6 +17,8 @@ services:
     networks:
       - soa-net
     restart: unless-stopped
+    depends_on:
+      - config-service
 
 
   gateway-service:
@@ -21,6 +31,8 @@ services:
     restart: unless-stopped
     depends_on:
       - eureka-service
+      - config-service
+
 
 
   orgdirectory-service:
@@ -33,7 +45,9 @@ services:
     restart: unless-stopped
     depends_on:
       - eureka-service
+      - config-service
       - wildfly
+
 
   wildfly:
     build:
@@ -111,7 +125,10 @@ services:
     networks:
       - soa-net
 
-#  consul-ui:
+
+
+
+  #  consul-ui:
 #    image: jippi/hashi-ui:latest
 #    container_name: consul-ui
 #    ports:

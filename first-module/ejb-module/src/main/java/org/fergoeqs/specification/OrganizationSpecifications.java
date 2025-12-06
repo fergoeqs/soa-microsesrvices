@@ -82,7 +82,6 @@ public class OrganizationSpecifications {
 
     private Predicate buildEqualsPredicate(CriteriaBuilder cb, Path<?> fieldPath, Object value, Class<?> fieldType) {
         if (fieldType == OrganizationType.class) {
-            // Особый случай для enum
             OrganizationType enumValue = OrganizationType.valueOf(value.toString());
             return cb.equal(fieldPath, enumValue);
         } else if (fieldType == String.class) {

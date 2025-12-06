@@ -1,0 +1,15 @@
+/subsystem=ejb3/strict-max-bean-instance-pool=ejbPool:add( \
+    max-pool-size=50, \
+    timeout=5, \
+    timeout-unit=SECONDS \
+)
+
+/subsystem=ejb3:write-attribute( \
+    name=default-slsb-instance-pool, \
+    value=ejbPool \
+)
+
+/subsystem=ejb3:write-attribute( \
+    name=default-mdb-instance-pool, \
+    value=ejbPool \
+)
