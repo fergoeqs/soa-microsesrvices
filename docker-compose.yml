@@ -1,13 +1,12 @@
 services:
-  config-service:
-    build: ./config-service
-    container_name: config-service
-    ports:
-      - "8888:8888"
-    networks:
-      - soa-net
-    restart: unless-stopped
-
+#  config-service:
+#    build: ./config-service1
+#    container_name: config-service
+#    ports:
+#      - "8888:8888"
+#    networks:
+#      - soa-net
+#    restart: unless-stopped
 
   eureka-service:
     build: ./eureka-service
@@ -17,8 +16,8 @@ services:
     networks:
       - soa-net
     restart: unless-stopped
-    depends_on:
-      - config-service
+#    depends_on:
+#      - config-service
 
 
   gateway-service:
@@ -31,7 +30,7 @@ services:
     restart: unless-stopped
     depends_on:
       - eureka-service
-      - config-service
+#      - config-service
 
 
 
@@ -46,7 +45,7 @@ services:
     depends_on:
       - eureka-service
       - web-server
-      - config-service
+#      - config-service
 
   orgdirectory-service-2:
     build: ./second-service
