@@ -6,6 +6,7 @@ import org.fergoeqs.mapper.OrganizationMapper;
 import org.fergoeqs.model.Organization;
 import org.fergoeqs.repository.OrganizationRepository;
 
+import jakarta.ejb.Remote;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Stateless
+@Remote(OrganizationServiceRemote.class)
 public class OrganizationServiceImpl implements OrganizationServiceRemote {
 
     @Inject
@@ -24,7 +26,14 @@ public class OrganizationServiceImpl implements OrganizationServiceRemote {
 
     @Override
     public String test() {
-        return "ejb работает, тварь";
+
+        String threadName = Thread.currentThread().getName();
+        String callerInfo = "Thread: " + threadName +
+                ", Remote call detected: " +
+                (this.getClass().getInterfaces().length > 0 ? "YES" : "NO");
+        System.out.println(callerInfo);
+        System.out.println("EJB Instance: " + this);
+        return "ejb работает, тварь (remote call)";
     }
 
     @Override

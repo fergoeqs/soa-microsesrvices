@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
     depends_on:
       - eureka-service
-      - wildfly
+      - web-server
 
   orgdirectory-service-2:
     build: ./second-service
@@ -43,19 +43,58 @@ services:
     restart: unless-stopped
     depends_on:
       - eureka-service
-      - wildfly
+      - web-server
 
-  wildfly:
+  ejb-server:
     build:
       context: ./first-module
-      dockerfile: Dockerfile-wildfly
-    container_name: organization-service-wildfly
+      dockerfile: Dockerfile-ejb-server
+    container_name: ejb-server
+    ports:
+      - "8085:8080"
+      - "9991:9990"
+    networks:
+      - soa-net
+    restart: unless-stopped
+    depends_on:
+      - dev-pg12
+    environment:
+      - EJB_SERVER_NAME=ejb-server
+
+  web-server:
+    build:
+      context: ./first-module
+      dockerfile: Dockerfile-web-server
+    container_name: web-server
     ports:
       - "8082:8080"
       - "9990:9990"
     networks:
       - soa-net
     restart: unless-stopped
+    depends_on:
+      - ejb-server
+    environment:
+      - EJB_SERVER_HOST=ejb-server
+      - EJB_SERVER_PORT=8080
+      - EJB_USERNAME=admin
+      - EJB_PASSWORD=admin
+      - SERVICE_NAME=organization-service
+      - SERVICE_ID=web-server
+      - SERVICE_PORT=8080
+      - SERVICE_ADDRESS=web-server
+
+  # wildfly:
+  #   build:
+  #     context: ./first-module
+  #     dockerfile: Dockerfile-wildfly
+  #   container_name: organization-service-wildfly
+  #   ports:
+  #     - "8086:8080"
+  #     - "9992:9990"
+  #   networks:
+  #     - soa-net
+  #   restart: unless-stopped
 
   organization-service-1:
     build:
@@ -112,11 +151,11 @@ services:
     image: curlimages/curl:latest
     container_name: consul-register
     depends_on:
-      - wildfly
+      - web-server
       - consul
     volumes:
       - ./first-module/web-module/register-consul.sh:/register-consul.sh
-#      - ./register-consul.sh:/register-consul.sh
+    #      - ./register-consul.sh:/register-consul.sh
     entrypoint: [ "sh", "/register-consul.sh" ]
     networks:
       - soa-net
@@ -135,30 +174,30 @@ services:
     networks:
       - soa-net
 
-#  swagger-ui:
-#    image: swaggerapi/swagger-ui
-#    container_name: organization-api-docs
-#    ports:
-#      - "8080:8080"
-#    volumes:
-#      - ./:/usr/share/nginx/html/specs
-#    environment:
-#      SWAGGER_JSON: /usr/share/nginx/html/specs/ipsreleasenofun.yml
-##      API_URL: http://localhost:8080/organization-service/v3/api-docs
-#    restart: unless-stopped
-#    networks:
-#      - soa-net
-#  frontend:
-#    build:
-#      context: ./nginx/frontend
-#      dockerfile: Dockerfile-frontend
-#    container_name: frontend
-#    ports:
-#      - "80:80"
-#    networks:
-#      - soa-net
-#    depends_on:
-#      - gateway-service
+  #  swagger-ui:
+  #    image: swaggerapi/swagger-ui
+  #    container_name: organization-api-docs
+  #    ports:
+  #      - "8080:8080"
+  #    volumes:
+  #      - ./:/usr/share/nginx/html/specs
+  #    environment:
+  #      SWAGGER_JSON: /usr/share/nginx/html/specs/ipsreleasenofun.yml
+  ##      API_URL: http://localhost:8080/organization-service/v3/api-docs
+  #    restart: unless-stopped
+  #    networks:
+  #      - soa-net
+  #  frontend:
+  #    build:
+  #      context: ./nginx/frontend
+  #      dockerfile: Dockerfile-frontend
+  #    container_name: frontend
+  #    ports:
+  #      - "80:80"
+  #    networks:
+  #      - soa-net
+  #    depends_on:
+  #      - gateway-service
 
   nginx:
     build:

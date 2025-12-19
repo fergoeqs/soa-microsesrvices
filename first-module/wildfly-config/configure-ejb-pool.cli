@@ -1,0 +1,18 @@
+embed-server --server-config=standalone.xml --std-out=echo
+
+batch
+/subsystem=ejb3/strict-max-bean-instance-pool=slsb-strict-max-pool:add(max-pool-size=50, timeout=5, timeout-unit=MINUTES)
+run-batch
+
+batch
+/subsystem=ejb3/strict-max-bean-instance-pool=slsb-strict-max-pool:write-attribute(name=max-pool-size, value=50)
+/subsystem=ejb3/strict-max-bean-instance-pool=slsb-strict-max-pool:write-attribute(name=timeout, value=5)
+/subsystem=ejb3/strict-max-bean-instance-pool=slsb-strict-max-pool:write-attribute(name=timeout-unit, value=MINUTES)
+run-batch
+
+
+batch
+/subsystem=remoting/http-connector=http-remoting-connector:write-attribute(name=connector-ref, value=default)
+run-batch
+
+stop-embedded-server

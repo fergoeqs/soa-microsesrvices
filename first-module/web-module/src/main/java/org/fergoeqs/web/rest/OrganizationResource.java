@@ -2,22 +2,34 @@ package org.fergoeqs.web.rest;
 
 import org.fergoeqs.dto.*;
 import org.fergoeqs.service.OrganizationServiceRemote;
+import org.fergoeqs.web.config.EJBClientConfig;
 
-import jakarta.ejb.EJB;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/organizations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class OrganizationResource {
 
-    @EJB
-    private OrganizationServiceRemote organizationService;
+    @Inject
+    private EJBClientConfig ejbClientConfig;
+
+    private OrganizationServiceRemote getOrganizationService() {
+        // Using remote call via JNDI lookup
+        OrganizationServiceRemote service = ejbClientConfig.getOrganizationServiceRemote();
+        if (service == null) {
+            throw new RuntimeException("EJB Remote service is not available");
+        }
+        return service;
+    }
 
     public OrganizationResource() {
     }
@@ -25,7 +37,13 @@ public class OrganizationResource {
     @GET
     @Path("/test")
     public String test() {
-        return "rabotaet tvar: " + (organizationService != null ? "INJECTED" : "NULL");
+        try {
+            OrganizationServiceRemote service = getOrganizationService();
+            return "rabotaet tvar: " + (service != null ? "REMOTE EJB INJECTED" : "NULL") +
+                    " - " + service.test();
+        } catch (Exception e) {
+            return "ERROR: " + e.getMessage();
+        }
     }
 
     @GET
@@ -38,7 +56,7 @@ public class OrganizationResource {
     @Path("/search")
     public Response searchOrganizations(@Valid FilterRequestDTO filterRequest) {
         try {
-            PaginatedResponseDTO response = organizationService.searchOrganizationsWithSorting(filterRequest);
+            PaginatedResponseDTO response = getOrganizationService().searchOrganizationsWithSorting(filterRequest);
             return Response.ok(response).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -50,7 +68,7 @@ public class OrganizationResource {
     @POST
     public Response createOrganization(@Valid OrganizationRequestDTO organizationRequest) {
         try {
-            OrganizationResponseDTO created = organizationService.createOrganization(organizationRequest);
+            OrganizationResponseDTO created = getOrganizationService().createOrganization(organizationRequest);
             return Response
                     .created(URI.create("/organizations/" + created.id()))
                     .entity(created)
@@ -66,7 +84,7 @@ public class OrganizationResource {
     @Path("/{id}")
     public Response getOrganizationById(@PathParam("id") Long id) {
         try {
-            OrganizationResponseDTO organization = organizationService.getOrganizationById(id);
+            OrganizationResponseDTO organization = getOrganizationService().getOrganizationById(id);
             return Response.ok(organization).build();
         } catch (Exception e) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -81,7 +99,7 @@ public class OrganizationResource {
             @PathParam("id") Long id,
             @Valid OrganizationRequestDTO organizationRequest) {
         try {
-            OrganizationResponseDTO updated = organizationService.updateOrganization(id, organizationRequest);
+            OrganizationResponseDTO updated = getOrganizationService().updateOrganization(id, organizationRequest);
             return Response.ok(updated).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -98,7 +116,7 @@ public class OrganizationResource {
     @Path("/{id}")
     public Response deleteOrganization(@PathParam("id") Long id) {
         try {
-            organizationService.deleteOrganization(id);
+            getOrganizationService().deleteOrganization(id);
             return Response.noContent().build();
         } catch (Exception e) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -111,7 +129,7 @@ public class OrganizationResource {
     @Path("/by-address")
     public Response deleteOrganizationByAddress(@Valid AddressRequestDTO addressRequest) {
         try {
-            organizationService.deleteOrganizationByAddress(addressRequest.street());
+            getOrganizationService().deleteOrganizationByAddress(addressRequest.street());
             return Response.noContent().build();
         } catch (Exception e) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -124,7 +142,7 @@ public class OrganizationResource {
     @Path("/group-by-fullname")
     public Response groupOrganizationsByFullName() {
         try {
-            Map<String, Long> result = organizationService.groupOrganizationsByFullName();
+            Map<String, Long> result = getOrganizationService().groupOrganizationsByFullName();
             return Response.ok(result).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -137,7 +155,7 @@ public class OrganizationResource {
     @Path("/count-by-address")
     public Response countOrganizationsByAddressLessThan(@Valid AddressRequestDTO addressRequest) {
         try {
-            Long count = organizationService.countOrganizationsByAddressLessThan(addressRequest.street());
+            Long count = getOrganizationService().countOrganizationsByAddressLessThan(addressRequest.street());
             return Response.ok(Map.of("count", count)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

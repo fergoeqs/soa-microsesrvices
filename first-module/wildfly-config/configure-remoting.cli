@@ -1,0 +1,9 @@
+embed-server --server-config=standalone.xml --std-out=echo
+
+batch
+
+/subsystem=remoting/http-connector=http-remoting-connector:write-attribute(name=connector-ref, value=default)
+run-batch
+
+stop-embedded-server
+

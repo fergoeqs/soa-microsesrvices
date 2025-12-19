@@ -25,7 +25,6 @@ foreach ($dir in $projectDirs) {
 
 docker compose down
 docker compose build
-docker compose up -d config-service
 Start-Sleep -Seconds 5
 
 try {

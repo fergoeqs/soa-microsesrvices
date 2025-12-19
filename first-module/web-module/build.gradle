@@ -5,12 +5,42 @@ plugins {
 
 dependencies {
     compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
-    implementation project(':ejb-module')
+    implementation 'org.jboss.resteasy:resteasy-jackson2-provider:6.2.8.Final'
+    implementation(project(':ejb-module')) {
+        exclude group: 'org.hibernate', module: 'hibernate-core'
+    }
     implementation 'com.ecwid.consul:consul-api:1.4.5'
+}
+
+task createEjbClientJar(type: Jar) {
+    archiveBaseName = 'organization-ejb-client'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(project(':ejb-module').sourceSets.main.output) {
+        exclude 'META-INF/persistence.xml'
+        exclude '**/org/fergoeqs/model/Organization.class'
+        exclude '**/org/fergoeqs/model/Address.class'
+        exclude '**/org/fergoeqs/model/Coordinates.class'
+        exclude '**/org/fergoeqs/repository/**'
+        exclude '**/org/fergoeqs/service/OrganizationServiceImpl.class'
+        exclude '**/org/fergoeqs/mapper/**'
+        exclude '**/org/fergoeqs/specification/**'
+    }
 }
 
 war {
     archiveFileName = 'web-module.war'
+    dependsOn createEjbClientJar
+
+    classpath = classpath.filter { file ->
+        !file.name.contains('organization-ejb.jar')
+    }
+
+    from(createEjbClientJar.archiveFile) {
+        into('WEB-INF/lib')
+    }
 }
