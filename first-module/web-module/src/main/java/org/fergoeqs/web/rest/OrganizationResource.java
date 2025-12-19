@@ -163,17 +163,5 @@ public class OrganizationResource {
                     .build();
         }
     }
-//
-//    @POST
-//    @Path("/count-by-address-exact")
-//    public Response countOrganizationsByAddressExact(@Valid AddressRequestDTO addressRequest) {
-//        try {
-//            Long count = organizationService.countOrganizationsByAddress(addressRequest.street());
-//            return Response.ok(Map.of("count", count)).build();
-//        } catch (Exception e) {
-//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-//                    .entity(Map.of("error", e.getMessage()))
-//                    .build();
-//        }
-//    }
+
 }
