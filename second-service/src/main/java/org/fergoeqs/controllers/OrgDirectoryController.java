@@ -1,17 +1,10 @@
 package org.fergoeqs.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.fergoeqs.dtos.FilterConditionDTO;
-import org.fergoeqs.dtos.FilterRequestDTO;
-import org.fergoeqs.dtos.SortOptionDTO;
-import org.springframework.beans.factory.annotation.Value;
+import org.fergoeqs.service.SoapClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,63 +12,99 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OrgDirectoryController {
 
-    private final WebClient webClient;
-
-    @Value("${first-service.base-url}")
-    private String firstServiceBaseUrl;
+    private final SoapClientService soapClientService;
 
     @PostMapping("/filter/turnover")
-    public Mono<ResponseEntity<Object>> filterByTurnover(@RequestBody Map<String, Object> body) {
-        System.out.println(">>> firstServiceBaseUrl = " + firstServiceBaseUrl);
-
-        Integer min = (Integer) body.get("minAnnualTurnover");
-        Integer max = (Integer) body.get("maxAnnualTurnover");
+    public ResponseEntity<Object> filterByTurnover(@RequestBody Map<String, Object> body) {
+        Integer min = null;
+        if (body.containsKey("minAnnualTurnover")) {
+            Object minObj = body.get("minAnnualTurnover");
+            if (minObj instanceof Number) {
+                min = ((Number) minObj).intValue();
+            } else if (minObj instanceof String) {
+                min = Integer.parseInt((String) minObj);
+            }
+        }
+        
+        Integer max = null;
+        if (body.containsKey("maxAnnualTurnover")) {
+            Object maxObj = body.get("maxAnnualTurnover");
+            if (maxObj instanceof Number) {
+                max = ((Number) maxObj).intValue();
+            } else if (maxObj instanceof String) {
+                max = Integer.parseInt((String) maxObj);
+            }
+        }
+        
         if (min == null || max == null || min > max) {
-            return Mono.just(ResponseEntity.badRequest().body("Invalid turnover range"));
+            return ResponseEntity.badRequest().body("Invalid turnover range");
         }
 
-        List<Map<String, Object>> additionalFilters =
-                (List<Map<String, Object>>) body.getOrDefault("filters", List.of());
-        List<FilterConditionDTO> filters = new ArrayList<>();
-
-        for (Map<String, Object> f : additionalFilters) {
-            filters.add(new FilterConditionDTO(
-                    (String) f.get("field"),
-                    (String) f.get("operator"),
-                    f.get("value")
-            ));
+        Integer page = 0;
+        if (body.containsKey("page")) {
+            Object pageObj = body.get("page");
+            if (pageObj instanceof Number) {
+                page = ((Number) pageObj).intValue();
+            } else if (pageObj instanceof String) {
+                page = Integer.parseInt((String) pageObj);
+            }
         }
 
-        filters.add(new FilterConditionDTO("annualTurnover", "between", List.of(min, max)));
+        Integer size = 20;
+        if (body.containsKey("size")) {
+            Object sizeObj = body.get("size");
+            if (sizeObj instanceof Number) {
+                size = ((Number) sizeObj).intValue();
+            } else if (sizeObj instanceof String) {
+                size = Integer.parseInt((String) sizeObj);
+            }
+        }
 
-        List<SortOptionDTO> sort = (List<SortOptionDTO>) body.getOrDefault("sort", List.of());
-        Integer page = (Integer) body.getOrDefault("page", 0);
-        Integer size = (Integer) body.getOrDefault("size", 20);
+        Object result = soapClientService.filterByTurnover(
+                min,
+                max,
+                (java.util.List<Map<String, Object>>) body.getOrDefault("filters", java.util.List.of()),
+                (java.util.List<Map<String, Object>>) body.getOrDefault("sort", java.util.List.of()),
+                page,
+                size
+        );
 
-        FilterRequestDTO requestDTO = new FilterRequestDTO(filters, sort, page, size);
-        return webClient.post()
-                .uri(firstServiceBaseUrl + "/search")
-                .bodyValue(requestDTO)
-                .retrieve()
-                .bodyToMono(Object.class)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(500)
-                        .body("Error calling organization service: " + e.getMessage())));
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/order")
-    public Mono<ResponseEntity<Object>> orderOrganizations(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Object> orderOrganizations(@RequestBody Map<String, Object> body) {
         if (!body.containsKey("sort")) {
-            return Mono.just(ResponseEntity.badRequest().body("Missing sort criteria"));
+            return ResponseEntity.badRequest().body("Missing sort criteria");
         }
 
-        return webClient.post()
-                .uri(firstServiceBaseUrl + "/search")
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(Object.class)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(500)
-                        .body("Error calling organization service: " + e.getMessage())));
+        Integer page = 0;
+        if (body.containsKey("page")) {
+            Object pageObj = body.get("page");
+            if (pageObj instanceof Number) {
+                page = ((Number) pageObj).intValue();
+            } else if (pageObj instanceof String) {
+                page = Integer.parseInt((String) pageObj);
+            }
+        }
+
+        Integer size = 20;
+        if (body.containsKey("size")) {
+            Object sizeObj = body.get("size");
+            if (sizeObj instanceof Number) {
+                size = ((Number) sizeObj).intValue();
+            } else if (sizeObj instanceof String) {
+                size = Integer.parseInt((String) sizeObj);
+            }
+        }
+
+        Object result = soapClientService.orderOrganizations(
+                (java.util.List<Map<String, Object>>) body.get("sort"),
+                (java.util.List<Map<String, Object>>) body.getOrDefault("filters", java.util.List.of()),
+                page,
+                size
+        );
+
+        return ResponseEntity.ok(result);
     }
 }
