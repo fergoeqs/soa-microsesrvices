@@ -23,7 +23,6 @@ public class OrganizationResource {
     private EJBClientConfig ejbClientConfig;
 
     private OrganizationServiceRemote getOrganizationService() {
-        // Using remote call via JNDI lookup
         OrganizationServiceRemote service = ejbClientConfig.getOrganizationServiceRemote();
         if (service == null) {
             throw new RuntimeException("EJB Remote service is not available");

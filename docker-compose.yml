@@ -141,23 +141,23 @@ services:
       - SERVICE_PORT=8080
       - SERVICE_ADDRESS=organization-service-1
 
-  organization-service-2:
-    build:
-      context: ./first-module
-      dockerfile: Dockerfile-wildfly
-    container_name: organization-service-2
-    ports:
-      - "8083:8080"
-    networks:
-      - soa-net
-    restart: unless-stopped
-    depends_on:
-      - consul
-    environment:
-      - SERVICE_NAME=organization-service
-      - SERVICE_ID=organization-service-2
-      - SERVICE_PORT=8080
-      - SERVICE_ADDRESS=organization-service-2
+#  organization-service-2:
+#    build:
+#      context: ./first-module
+#      dockerfile: Dockerfile-wildfly
+#    container_name: organization-service-2
+#    ports:
+#      - "8083:8080"
+#    networks:
+#      - soa-net
+#    restart: unless-stopped
+#    depends_on:
+#      - consul
+#    environment:
+#      - SERVICE_NAME=organization-service
+#      - SERVICE_ID=organization-service-2
+#      - SERVICE_PORT=8080
+#      - SERVICE_ADDRESS=organization-service-2
 
   consul:
     image: consul:1.14
@@ -174,18 +174,18 @@ services:
       timeout: 3s
       retries: 5
 
-  consul-register:
-    image: curlimages/curl:latest
-    container_name: consul-register
-    depends_on:
-      - web-server
-      - consul
-    volumes:
-      - ./first-module/web-module/register-consul.sh:/register-consul.sh
-    #      - ./register-consul.sh:/register-consul.sh
-    entrypoint: [ "sh", "/register-consul.sh" ]
-    networks:
-      - soa-net
+#  consul-register:
+#    image: curlimages/curl:latest
+#    container_name: consul-register
+#    depends_on:
+#      - web-server
+#      - consul
+##    volumes:
+##      - ./first-module/web-module/register-consul.sh:/register-consul.sh
+##    #      - ./register-consul.sh:/register-consul.sh
+##    entrypoint: [ "sh", "/register-consul.sh" ]
+#    networks:
+#      - soa-net
 
   dev-pg12:
     container_name: soa-db
