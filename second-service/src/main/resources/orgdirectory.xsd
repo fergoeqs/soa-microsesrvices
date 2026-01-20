@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://fergoeqs.org/orgdirectory"
+           xmlns:tns="http://fergoeqs.org/orgdirectory"
+           elementFormDefault="qualified">
+
+    <xs:element name="FilterByTurnoverRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="minAnnualTurnover" type="xs:int"/>
+                <xs:element name="maxAnnualTurnover" type="xs:int"/>
+                <xs:element name="filters" type="tns:FilterConditions" minOccurs="0"/>
+                <xs:element name="sort" type="tns:SortOptions" minOccurs="0"/>
+                <xs:element name="page" type="xs:int" minOccurs="0" default="0"/>
+                <xs:element name="size" type="xs:int" minOccurs="0" default="20"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="FilterByTurnoverResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="result" type="xs:anyType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="OrderOrganizationsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="sort" type="tns:SortOptions"/>
+                <xs:element name="filters" type="tns:FilterConditions" minOccurs="0"/>
+                <xs:element name="page" type="xs:int" minOccurs="0" default="0"/>
+                <xs:element name="size" type="xs:int" minOccurs="0" default="20"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="OrderOrganizationsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="result" type="xs:anyType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="FilterConditions">
+        <xs:sequence>
+            <xs:element name="filter" type="tns:FilterCondition" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="FilterCondition">
+        <xs:sequence>
+            <xs:element name="field" type="xs:string"/>
+            <xs:element name="operator" type="xs:string"/>
+            <xs:element name="value" type="xs:anyType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SortOptions">
+        <xs:sequence>
+            <xs:element name="sortOption" type="tns:SortOption" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SortOption">
+        <xs:sequence>
+            <xs:element name="field" type="xs:string"/>
+            <xs:element name="direction" type="xs:string" minOccurs="0"/>
+            <xs:element name="priority" type="xs:int" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
